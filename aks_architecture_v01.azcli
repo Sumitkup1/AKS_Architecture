@@ -1,3 +1,4 @@
+##### AKS_Architecture - v01 (Sumit Kumar-Aug 2020)
 ##### deploy components in hub subscription
 ##### hub subscription variables - change naming convention of variables based on your naming standards
 hub_subscription_ID=<your subscription id> # type your hub subscription id 
