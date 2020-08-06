@@ -21,3 +21,17 @@ The following are key highlights of AKS architecture deployed using Azure CLI sc
 • Azure Container Registry service created in the Spoke using Private Endpoint to retain traffic on a private network from AKS cluster nodes.
 
 • AKS cluster access is secured using ‘Private mode’ – JumpHost is deployed in a separate subnet to administer, access, and manage the AKS cluster. JumpHost subnet can be used for CI/CD tools as well.
+
+
+As part of this scaffolding deployment, the following Azure resources are deployed:
+
+* Virtual networks & Subnets
+* Virtual Network Gateway
+* Network Security Groups
+* NSG Rules
+* NAT Gateway
+* Azure Firewall
+Application Gateway
+Azure Bastion
+Route Tables
+Recovery Services Vault
