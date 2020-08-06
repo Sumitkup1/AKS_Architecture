@@ -32,10 +32,19 @@ As part of this scripted deployment, the following Azure resources are deployed:
 
 ## Deployment of AKS environment:
 
-There are two sections in this script--
+There are two sections in aks_architecture_v01.azcli script--
 
 1. Deploy components in Hub subscription
 2. Deploy AKS cluster in Spoke subscription
 
+Note - You can create separate out these sections into two separate scripts if login credentials for Hub and Spoke subscriptions are different. 
 
-### Note- In this architecture, 
+## Manual Steps:
+
+In this architecture, Application Gateway Ingress Controller (AGIC) is deployed in Hub subscription in an isolated subnet and independent Route table to create the complete end-to-end private vNet AKS cluster, therefore you will have to add static route to the table associated to AGIC subnet when you provision a container in your cluster environment. 
+
+The step can be executed using CI/CD pipeline after container has been created. The following CLI command can be used to update AGIC route table.
+
+Note - You will have to update --address-prefix and --next-hop-ip-address parameters values.
+
+az network route-table route create --resource-group $ask_ingress_rsg --name aks-nodepool1-32505125-vmss000000 --route-table-name $aks_ingress_udr_name --address-prefix 10.244.0.0/24 --next-hop-type VirtualAppliance --next-hop-ip-address 10.0.33.5 

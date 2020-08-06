@@ -145,5 +145,5 @@ aks_cluster_id=$(az aks show --resource-group $aks_rsg --name $aks_cluster_name 
 az role assignment create --assignee $spn_ID --scope $aks_cluster_id --role "Monitoring Metrics Publisher"
 
 ##### update AGIC route table
-##### Note: This is manual step
+##### Note: This is a manual step that needs to be executed after container has been created on your AKS cluster. You will have to update --address-prefix and --next-hop-ip-address parameters values.
 # az network route-table route create --resource-group $ask_ingress_rsg --name aks-nodepool1-32505125-vmss000000 --route-table-name $aks_ingress_udr_name --address-prefix 10.244.0.0/24 --next-hop-type VirtualAppliance --next-hop-ip-address 10.0.33.5
