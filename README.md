@@ -47,4 +47,4 @@ The step can be executed using CI/CD pipeline after container has been created. 
 
 Note - You will have to update --address-prefix and --next-hop-ip-address parameters values.
 
-az network route-table route create --resource-group $ask_ingress_rsg --name aks-nodepool1-32505125-vmss000000 --route-table-name $aks_ingress_udr_name --address-prefix 10.244.0.0/24 --next-hop-type VirtualAppliance --next-hop-ip-address 10.0.33.5 
+##### az network route-table route create --resource-group $ask_ingress_rsg --name aks-nodepool1-32505125-vmss000000 --route-table-name $aks_ingress_udr_name --address-prefix 10.244.0.0/24 --next-hop-type VirtualAppliance --next-hop-ip-address 10.0.33.5 
