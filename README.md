@@ -11,8 +11,13 @@ The following AKS architecture that is marked with purple dotted line boundary w
 The following are key highlights of AKS architecture deployed using Azure CLI script:
 
 • AKS architecture is based on ‘kubenet’ networking model and deployed within Azure vNet (private network).
+
 • Application Gateway Ingress Controller* deployed in the Hub construct aligning with the Azure Scaffold foundation Hub-Spoke architecture. Ingress traffic (internet inbound) traverse through Application Gateway placed in the Hub.
+
 • Egress traffic (Internet outbound only) traverse through Azure Firewall deployed in the Hub construct.
+
 • Azure Kubernetes Service Cluster nodes are deployed in the Spoke (Prod) subscription.
+
 • Azure Container Registry service created in the Spoke using Private Endpoint to retain traffic on a private network from AKS cluster nodes.
+
 • AKS cluster access is secured using ‘Private mode’ – JumpHost is deployed in a separate subnet to administer, access, and manage the AKS cluster. JumpHost subnet can be used for CI/CD tools as well.
