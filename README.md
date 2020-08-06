@@ -4,7 +4,7 @@ This Azure CLI script deploys a secure Azure Kubernetes Service architecture and
 
 The following AKS architecture that is marked with purple dotted line boundary will be deployed using Azure CLI script, other components outside of these dotted lines are deployed via Azure Scaffold templates –
 
-https://github.com/Sumitkup1/AKS_Architecture/raw/master/aks_architecture_v01.png
+![Architecture Image] https://github.com/Sumitkup1/AKS_Architecture/raw/master/aks_architecture_v01.png
 
 
 The following are key highlights of AKS architecture deployed using Azure CLI script:
