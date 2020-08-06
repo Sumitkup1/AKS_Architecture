@@ -40,9 +40,9 @@ Note - You can create separate out these sections into two separate scripts if l
 
 ### Manual Step:
 
-In this architecture, Application Gateway Ingress Controller (AGIC) is deployed in Hub subscription in an isolated subnet and independent Route table to create the complete end-to-end private vNet AKS cluster, therefore you will have to add static route to the table associated to AGIC subnet when you provision a container in your cluster environment. 
+In this architecture, Application Gateway Ingress Controller (AGIC) is deployed in Hub subscription in an isolated subnet with a separate Route table to create complete end-to-end private vNet AKS cluster, therefore you will have to add static route to the table associated to AGIC subnet when you provision a container in your cluster environment.
 
-The step can be executed using CI/CD pipeline after container has been created. The following CLI command can be used to update AGIC route table.
+This step can be executed using CI/CD pipeline after container has been created and following CLI command can be used to update AGIC route table.
 
 Note - You will have to update --address-prefix and --next-hop-ip-address parameters values.
 
