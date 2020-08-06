@@ -39,7 +39,7 @@ There are two sections in aks_architecture_v01.azcli script--
 
 Note - You can create separate out these sections into two separate scripts if login credentials for Hub and Spoke subscriptions are different. 
 
-## Manual Steps:
+### Manual Step:
 
 In this architecture, Application Gateway Ingress Controller (AGIC) is deployed in Hub subscription in an isolated subnet and independent Route table to create the complete end-to-end private vNet AKS cluster, therefore you will have to add static route to the table associated to AGIC subnet when you provision a container in your cluster environment. 
 
