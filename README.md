@@ -30,7 +30,7 @@ As part of this scripted deployment, the following Azure resources are deployed:
 * Azure Container Registry
 
 
-Deployment of AKS environment:
+## Deployment of AKS environment:
 
 There are two sections in this script--
 
@@ -38,8 +38,8 @@ There are two sections in this script--
 2. Deploy AKS cluster in Spoke subscription
 
 
-## deploy domponents in hub subscription
-## hub subscription variables - change naming convention of variables based on your naming standards
+##### deploy components in hub subscription
+##### hub subscription variables - change naming convention of variables based on your naming standards
 hub_subscription_ID=<your subscription id> # type your hub subscription id 
 location=australiaeast
 hub_vnet_name=auehubvnet01 # existing hub vnet deployed using Azure scaffold templates
@@ -54,7 +54,7 @@ ask_ingress_rsg=auehubrsg02
 aks_ingress_udr_name=auehubudr6
 aks_default_route_name=default_internet
 
-## create subnet, resource group, route table, routes and App Gateway Ingress Controller
+##### create subnet, resource group, route table, routes and App Gateway Ingress Controller
 az account set --subscription $hub_subscription_ID
 
 ingress_subnet_ID=$(az network vnet subnet create -g $hub_rsg_name --vnet-name $hub_vnet_name -n $ingress_subnet_name --address-prefix $ingress_address --service-endpoints 'Microsoft.Storage' 'Microsoft.Sql' 'Microsoft.AzureActiveDirectory' 'Microsoft.AzureCosmosDB' 'Microsoft.Web' 'Microsoft.KeyVault' 'Microsoft.EventHub' 'Microsoft.ServiceBus' 'Microsoft.ContainerRegistry' 'Microsoft.CognitiveServices' -o json | jq -r '.id')
@@ -71,7 +71,7 @@ az network route-table route create --resource-group $ask_ingress_rsg --name $ak
 
 az network vnet subnet update --route-table $ingress_udr_ID --vnet-name $hub_vnet_name --resource-group $hub_rsg_name --name $ingress_subnet_name
 
-## prod subscription variables - change naming convention of variables based on your naming standards
+##### prod subscription variables - change naming convention of variables based on your naming standards
 prod_subscription_ID=<your subscription id> # type your prod subscription id here
 aks_rsg=aueprdrsg02
 aks_cluster_name=aueprdaksclu01
@@ -96,7 +96,7 @@ SPN_NAME=aueprdaksclu01_spn001
 aks_acr=aueprdacr01
 la_name=aueprdakslaw01
 
-### register resource provider and az extensions
+##### register resource provider and az extensions
 az account set --subscription $prod_subscription_ID
 az provider register --namespace Microsoft.ContainerRegistry
 az feature register --name AKS-IngressApplicationGatewayAddon --namespace microsoft.containerservice
@@ -109,9 +109,9 @@ az extension add --name aks-preview
 az extension add --name azure-firewall
 az extension list
 
-### Note - ensure that resource providers are registered before you proceed to the next step
+##### Note - ensure that resource providers are registered before you proceed to the next step
 
-# create subnets for aks environment
+##### create subnets for aks environment
 az account set --subscription $prod_subscription_ID
 
 aks_subnet_ID=$(az network vnet subnet create -g $prod_vnet_rsg_name --vnet-name $prod_vnet_name -n $aks_subnet_name --address-prefix $aks_address --service-endpoints 'Microsoft.Storage' 'Microsoft.Sql' 'Microsoft.AzureActiveDirectory' 'Microsoft.AzureCosmosDB' 'Microsoft.Web' 'Microsoft.KeyVault' 'Microsoft.EventHub' 'Microsoft.ServiceBus' 'Microsoft.ContainerRegistry' 'Microsoft.CognitiveServices' -o json | jq -r '.id')
@@ -122,12 +122,12 @@ aks_private_endpoint_ID=$(az network vnet subnet create -g $prod_vnet_rsg_name -
 
 az network vnet subnet update -n $aks_private_endpoint -g $prod_vnet_rsg_name --vnet-name $prod_vnet_name --disable-private-endpoint-network-policies true
 
-# get Az firewall properties
+##### get Az firewall properties
 az account set --subscription $hub_subscription_ID
 
 azfw_privateip=$(az network firewall show -g $hub_rsg_name -n $hub_fw_name --query "ipConfigurations[0].privateIpAddress" -o tsv)
 
-# create route table, route and associate to aks cluster subnet
+##### create route table, route and associate to aks cluster subnet
 az account set --subscription $prod_subscription_ID
 
 az network route-table create -g $prod_vnet_rsg_name --name $aks_udr_name
@@ -136,19 +136,19 @@ az network route-table route create --resource-group $prod_vnet_rsg_name --name 
 
 az network vnet subnet update --route-table $aks_udr_name --vnet-name $prod_vnet_name --resource-group $prod_vnet_rsg_name --name $aks_subnet_name
 
-# Creare specific rules on hub firewall to allow traffic
+##### creare specific rules on hub firewall to allow traffic
 az account set --subscription $hub_subscription_ID
 
 az network firewall network-rule create --firewall-name $hub_fw_name --collection-name "default_time" --destination-addresses "*"  --destination-ports 123 --name "allowed traffic" --protocols "UDP" --resource-group $hub_rsg_name --source-addresses "*" --action "Allow" --description "time sync allowed" --priority 101
 
 az network firewall network-rule create --firewall-name $hub_fw_name --collection-name "default_dns" --destination-addresses "*"  --destination-ports 53 --name "allowed traffic" --protocols "Any" --resource-group $hub_rsg_name --source-addresses "*" --action "Allow" --description "dns allowed" --priority 102
 
-#### Note- you can further restrict traffic by changing below rule to specific FQDNs/URLs, instead of using '*'
+##### Note- you can further restrict traffic by changing below rule to specific FQDNs/URLs, instead of using '*'
 
 az network firewall application-rule create  --firewall-name $hub_fw_name --collection-name "default_https" --name "allowed network" --protocols https=443 --source-addresses "*" --resource-group $hub_rsg_name --action "Allow" --target-fqdns "*" --priority 101
 sleep 60 # wait for az firewall to update
 
-## create spn and role assignment
+##### create spn and role assignment
 spn_ID=$(az ad sp create-for-rbac --skip-assignment --name $SPN_NAME -o json | jq '.appId' -r)
 
 spn_secret=$(az ad app credential reset --id $SPN_NAME -o json | jq '.password' -r)
@@ -165,20 +165,20 @@ aks_udr=$(az network route-table show --name $aks_udr_name --resource-group $pro
 az role assignment create --role "Contributor" --assignee $spn_ID --scope $aks_udr
 sleep 5 # wait for RBAC to propagate
 
-## create AKS Cluster
-az aks create --resource-group $aks_rsg --name $aks_cluster_name --load-balancer-sku standard --vm-set-type VirtualMachineScaleSets --enable-private-cluster --network-plugin kubenet --vnet-subnet-id $aks_subnet_ID --docker-bridge-address $docker_address --dns-service-ip $dns_service_ip --service-cidr $aks_service_address --service-principal $spn_ID --client-secret $spn_secret --kubernetes-version $aks_version --outbound-type userDefinedRouting --node-count 1
+##### create AKS Cluster
+az aks create --resource-group $aks_rsg --name $aks_cluster_name --load-balancer-sku standard --vm-set-type VirtualMachineScaleSets --enable-private-cluster --network-plugin kubenet --vnet-subnet-id $aks_subnet_ID --docker-bridge-address $docker_address --dns-service-ip $dns_service_ip --service-cidr $aks_service_address --service-principal $spn_ID --client-secret $spn_secret --kubernetes-version $aks_version --outbound-type userDefinedRouting --node-count 3
 
-# configure AGIC
+##### configure AGIC
 appgw_ID=$(az network application-gateway show -n $aks_appgw_name -g $ask_ingress_rsg -o tsv --query "id")
 az aks enable-addons -n $aks_cluster_name -g $aks_rsg -a ingress-appgw --appgw-id $appgw_ID
 
-# create acr, configure private endpoint for acr and integrate acr with aks cluster
+##### create acr, configure private endpoint for acr and integrate acr with aks cluster
 az acr create -n $aks_acr -g $aks_rsg --sku premium
 acr_ID=$(az acr show -n $aks_acr -o json | jq -r '.id')
 az network private-endpoint create --name $private_endpoint_name --resource-group $aks_rsg --subnet $aks_private_endpoint_ID --private-connection-resource-id $acr_ID --group-id registry --connection-name $acr_priv_connection_name
 az aks update -n $aks_cluster_name -g $aks_rsg --attach-acr $aks_acr
 
-# configure monitoring and log analytics workspace
+##### configure monitoring and log analytics workspace
 loganalytics_ID=$(az monitor log-analytics workspace create --resource-group $aks_rsg --workspace-name $la_name --location $location -o json | jq '.id' -r)
 az aks enable-addons --resource-group $aks_rsg --name $aks_cluster_name --addons monitoring --workspace-resource-id $loganalytics_ID
 aks_cluster_id=$(az aks show --resource-group $aks_rsg --name $aks_cluster_name -o json | jq '.id' -r)
