@@ -1,4 +1,4 @@
-# AKS_Architecture
+# AKS Reference Architecture
 
 This Azure CLI script deploys a secure Azure Kubernetes Service architecture and related components in your Azure vNet (private network) aligning with the Hub-Spoke topology architecture as discussed in the Azure Scaffold templates blog (<a href="https://techcommunity.microsoft.com/t5/azure-architecture-blog/azure-scaffold-templates/ba-p/1455574">link</a>). In this architecture, AKS cluster nodes hosted within Spoke construct and Application Gateway configured as ingress controller for traffic destined for containers deployed inside Hub construct and management hosts or CI/CD tools deployed in a dedicated subnet under Spoke construct. Hub construct will act as ingress and egress point for network traffic from and to internet for AKS cluster nodes and containers deployed inside Spoke construct. 
 
